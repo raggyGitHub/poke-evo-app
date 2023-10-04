@@ -1,6 +1,6 @@
 //components
 import {Button} from './components/Button';
-import {PokeCard} from './components/Card';
+import {Card} from './components/Card';
 //styles
 import './sass/App.scss';
 //icons
@@ -12,6 +12,7 @@ import {useEffect} from 'react';
 
 const App = () => {
   const [pokeId, setPokeID] = useState(1);
+  const [pokemonEvolutions, setPokemonEvolutions] = useState([]);
 
   useEffect(() => {
     getEvolutions(pokeId);
@@ -25,23 +26,24 @@ const App = () => {
     const data = await response.json();
     let pokemonEvoArray = [];
     let pokemonLvl1 = data.chain.species.name;
-    let pokemonLvl1Img = await getPokemonimages(pokemonLvl1);
+    let pokemonLvl1Img = await getPokemonImgs(pokemonLvl1);
     pokemonEvoArray.push([pokemonLvl1, pokemonLvl1Img]);
 
-    if (data.chain.evolves_to[0].length !== 0) {
+    if (data.chain.evolves_to.length !== 0) {
       let pokemonLvl2 = data.chain.evolves_to[0].species.name;
-      let pokemonLvl2Img = await getPokemonimages(pokemonLvl2);
+      let pokemonLvl2Img = await getPokemonImgs(pokemonLvl2);
       pokemonEvoArray.push([pokemonLvl2, pokemonLvl2Img]);
+
       if (data.chain.evolves_to[0].evolves_to.length !== 0) {
         let pokemonLvl3 = data.chain.evolves_to[0].evolves_to[0].species.name;
-        let pokemonLvl3Img = await getPokemonimages(pokemonLvl3);
+        let pokemonLvl3Img = await getPokemonImgs(pokemonLvl3);
         pokemonEvoArray.push([pokemonLvl3, pokemonLvl3Img]);
-        console.log(pokemonEvoArray);
       }
     }
+    setPokemonEvolutions(pokemonEvoArray);
   };
 
-  const getPokemonimages = async (name) => {
+  const getPokemonImgs = async (name) => {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`);
     const data = await response.json();
     return data.sprites.other['official-artwork'].front_default;
@@ -54,9 +56,11 @@ const App = () => {
     setPokeID(pokeId + 1);
   };
   return (
-    <>
-      <div className='card-container'>
-        <PokeCard />
+    <div className='app'>
+      <div className={`card-container card${pokemonEvolutions.length}`}>
+        {pokemonEvolutions.map((pokemon) => (
+          <Card key={pokemon[0]} name={pokemon[0]} img={pokemon[1]} />
+        ))}
       </div>
 
       <div className='buttons-container'>
@@ -64,7 +68,7 @@ const App = () => {
 
         <Button handleClick={handleClickNext} icon={<TiArrowRightOutline />} />
       </div>
-    </>
+    </div>
   );
 };
 
