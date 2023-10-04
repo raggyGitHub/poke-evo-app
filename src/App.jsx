@@ -65,7 +65,6 @@ const App = () => {
 
       <div className='buttons-container'>
         <Button handleClick={handleClickPrev} icon={<TiArrowLeftOutline />} />
-
         <Button handleClick={handleClickNext} icon={<TiArrowRightOutline />} />
       </div>
     </div>
